@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 __set_system() {
     firewall-cmd --state
     systemctl stop firewalld.service
@@ -9,7 +10,6 @@ __set_system() {
 
     setenforce 0
     sed -i 's,^SELINUX=.*$,SELINUX=disabled,' /etc/selinux/config
-
 }
 
 __repo_application_package() {
@@ -105,12 +105,10 @@ __main() {
     _repo="/mnt/alter/repo/"
     __set_system
     __repo_application_package
-    # __set_boot
     __init_docker
     __set_ntp
     tar zxvpf /mnt/alter/file.tar.gz -C / --strip-components 1
     ln -sf /usr/local/bin/qemu-system-x86_64 /usr/libexec/qemu-kvm
     __set_rc
 }
-
 __main

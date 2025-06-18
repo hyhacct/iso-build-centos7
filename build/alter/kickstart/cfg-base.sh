@@ -22,7 +22,7 @@ lang en_US.UTF-8
 # Network information
 # network  --bootproto=dhcp --device=eth0 --onboot=off --ipv6=auto --no-activate
 # network  --hostname=localhost.localdomain
-network --hostname=KuaiCDN
+network --hostname=WdyCDN
 
 # Root password
 rootpw --iscrypted $6$Sy53RrlGakCmu2uw$NFNQU3KIsFroMNyExEqmhVtugrxpH5T2WLdu3XMNHN8IfmynLGpz0lBQQWW8g/z/6qvlmgFxnrE0OhDtLWi7f0

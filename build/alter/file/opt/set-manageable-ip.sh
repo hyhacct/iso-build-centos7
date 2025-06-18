@@ -37,6 +37,5 @@ __main() {
         _nic=$(find /sys/class/net/* -not -lname '*virtual*' -printf '%f\n')
         __set
     }
-
 }
 __main
