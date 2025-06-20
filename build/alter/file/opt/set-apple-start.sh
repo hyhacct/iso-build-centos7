@@ -24,3 +24,20 @@
     echo 'alias ss="bash /opt/scripts/print-menu.sh"' >>/root/.bashrc
     source /root/.bashrc
 }
+
+# 配置 tty1
+{
+    _file_tty1="/etc/systemd/system/getty@tty1.service.d/autologin.conf"
+    mkdir -p "$(dirname $_file_tty1)"
+    cat >"$_file_tty1" <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
+EOF
+    systemctl daemon-reexec
+    systemctl enable getty@tty1.service
+    systemctl restart getty@tty1.service
+
+    # 注意不是 .bashrc，因为 .bash_profile 是 login shell 专用
+    echo 'bash /opt/scripts/menu.sh' >/root/.bash_profile
+}
