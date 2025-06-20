@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
+# 关闭防火墙和 SELinux
 __set_system() {
     firewall-cmd --state
     systemctl stop firewalld.service
     systemctl disable firewalld.service
-
     chkconfig NetworkManager off
     service NetworkManager stop
-
     setenforce 0
     sed -i 's,^SELINUX=.*$,SELINUX=disabled,' /etc/selinux/config
 }
 
+# 配置yum源
 __repo_application_package() {
     cat >/etc/yum.repos.d/Local-alter.repo <<EOF
 [cdrom-alter]
@@ -43,7 +43,7 @@ EOF
         vim vim-enhanced git jq bc tree unzip zip dos2unix sysstat psmisc lsof sshpass expect xfsprogs-devel \
         vnstat htop perf dstat glances fio lshw ntp xfsprogs-devel \
         pciutils bzip2 dmraid dosfstools lsof lvm2 man-pages man-pages-overrides mdadm ipmitool \
-        rng-tools rsync smartmontools systemtap-runtime tcpdump time traceroute xfsdump yum-langpacks yum-utils moreutils
+        rng-tools rsync smartmontools systemtap-runtime tcpdump time traceroute xfsdump yum-langpacks yum-utils moreutils qrencode
 
     echo "安装tmux"
     yum install -y --disablerepo=* --enablerepo=cdrom-alter tmux
@@ -71,16 +71,13 @@ EOF
     grub2-mkconfig -o /boot/grub2/grub.cfg
     grub2-mkconfig -o /boot/efi/EFI/centos/grub.cfg
 
-    {
-        # 开机免密码
-        sed -i 's,^ExecStart=.*$,ExecStart=-/sbin/agetty --autologin root --noclear %I,' /usr/lib/systemd/system/serial-getty@.service
-        sed -i 's,^ExecStart=.*$,ExecStart=-/sbin/agetty --autologin root --noclear %I,' /usr/lib/systemd/system/getty@.service
-
-        systemctl enable serial-getty@ttyS0.service
-    }
-
+    # 开机免密码
+    sed -i 's,^ExecStart=.*$,ExecStart=-/sbin/agetty --autologin root --noclear %I,' /usr/lib/systemd/system/serial-getty@.service
+    sed -i 's,^ExecStart=.*$,ExecStart=-/sbin/agetty --autologin root --noclear %I,' /usr/lib/systemd/system/getty@.service
+    systemctl enable serial-getty@ttyS0.service
 }
 
+# 配置ntp
 __set_ntp() {
     sec=$(shuf -i 1-59 -n 1)
     hour=$(shuf -i 1-23 -n 1)
@@ -89,11 +86,14 @@ $sec $hour * * * root /usr/sbin/ntpdate -u ntp.ubuntu.com cn.pool.ntp.org ntp.al
 EOF
 }
 
+# 配置rc.local
 __set_rc() {
-    echo "bash /opt/set-manageable-ip.sh" >>/etc/rc.local
-    chmod +x /etc/rc.d/rc.local
+    echo "bash /opt/set-apple-start.sh" >>/etc/rc.local # 开机启动apple
+    # echo "bash /opt/set-kernel-parameter.sh" >>/etc/rc.local # 优化内核参数
+    chmod +x /etc/rc.d/rc.local w
 }
 
+# 配置docker
 __init_docker() {
     usermod -aG docker root
     mkdir -p /etc/docker
@@ -101,6 +101,7 @@ __init_docker() {
     systemctl enable docker
 }
 
+# 主函数
 __main() {
     _repo="/mnt/alter/repo/"
     __set_system

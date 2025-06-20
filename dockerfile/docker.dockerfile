@@ -1,5 +1,5 @@
 FROM centos:7
-LABEL maintainer="Your Name <your.email@example.com>"
+LABEL maintainer="hyhacct@outlook.com"
 
 # 设置工作目录
 WORKDIR /apps
